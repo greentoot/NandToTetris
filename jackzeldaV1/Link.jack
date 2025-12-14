@@ -1,0 +1,77 @@
+// Link.jack - Le héros joueur
+class Link {
+    field int x, y;
+    field int direction; // 0=bas, 1=haut, 2=gauche, 3=droite
+    field MapManager mapManager;
+    field int attack;
+    field int defense;
+    
+    constructor Link new(int posX, int posY) {
+        let x = posX;
+        let y = posY;
+        let direction = 0;
+        let attack = 2;
+        let defense = 1;
+        return this;
+    }
+    
+    method void setMapManager(MapManager manager) {
+        let mapManager = manager;
+        return;
+    }
+    
+    method void move(int dx, int dy) {
+        let x = x + dx;
+        let y = y + dy;
+        do setDirection(dx, dy);
+        return;
+    }
+    
+    method void setDirection(int dx, int dy) {
+        if ((dy = 1) & (dx = 0)) { let direction = 0; }
+        if ((dy = -1) & (dx = 0)) { let direction = 1; }
+        if ((dx = -1) & (dy = 0)) { let direction = 2; }
+        if ((dx = 1) & (dy = 0)) { let direction = 3; }
+        return;
+    }
+    
+    method void setPosition(int newX, int newY) {
+        let x = newX;
+        let y = newY;
+        return;
+    }
+    
+    method void draw() {
+        var int location;
+        let location = ((y * 16) * 32) + ((x * 16) / 16);
+        
+        if (direction = 0) { do ZeldaSprites.drawLinkDown(location); }
+        if (direction = 1) { do ZeldaSprites.drawLinkUp(location); }
+        if (direction = 2) { do ZeldaSprites.drawLinkLeft(location); }
+        if (direction = 3) { do ZeldaSprites.drawLinkRight(location); }
+        
+        return;
+    }
+    
+    method void erase() {
+        var int px, py;
+        let px = x * 16;
+        let py = y * 16;
+        
+        do Screen.setColor(false);
+        do Screen.drawRectangle(px, py, px + 15, py + 15);
+        
+        return;
+    }
+    
+    method int getX() { return x; }
+    method int getY() { return y; }
+    method int getDirection() { return direction; }
+    method int getAttack() { return attack; }
+    method int getDefense() { return defense; }
+    
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+}

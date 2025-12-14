@@ -1,0 +1,385 @@
+// ZeldaGame.jack - Gestionnaire principal du jeu Zelda
+class ZeldaGame {
+    field MapManager mapManager;
+    field Link player;
+    field Combat combat;
+    field EnemyManager enemyManager;
+    field NPCManager npcManager;
+    field ItemManager itemManager;
+    field Inventory inventory;
+    field int gameState; // 0=exploration, 1=combat, 2=dialogue, 3=menu
+    field boolean running;
+    field int hearts;
+    field int maxHearts;
+    field int rupees;
+    field boolean hasSword;
+    field boolean hasShield;
+    field boolean hasBow;
+    
+    constructor ZeldaGame new() {
+        let mapManager = MapManager.new();
+        do mapManager.switchMap(0, 0);
+        let player = Link.new(8, 8);
+        do player.setMapManager(mapManager);
+        
+        let enemyManager = EnemyManager.new();
+        let npcManager = NPCManager.new();
+        let itemManager = ItemManager.new();
+        let inventory = Inventory.new();
+        
+        let combat = null;
+        let gameState = 0;
+        let running = true;
+        
+        let hearts = 3;
+        let maxHearts = 3;
+        let rupees = 0;
+        let hasSword = false;
+        let hasShield = false;
+        let hasBow = false;
+        
+        return this;
+    }
+    
+    method void run() {
+        var char key;
+        
+        do Screen.clearScreen();
+        do mapManager.draw();
+        do enemyManager.drawForMap(mapManager.getCurrentMapId());
+        do itemManager.drawForMap(mapManager.getCurrentMapId());
+        do player.draw();
+        do drawHUD();
+        
+        while (running) {
+            let key = Keyboard.keyPressed();
+            
+            if (gameState = 0) { // Exploration
+                if (key = 131) { do handleMove(0, -1); }
+                if (key = 133) { do handleMove(0, 1); }
+                if (key = 130) { do handleMove(-1, 0); }
+                if (key = 132) { do handleMove(1, 0); }
+                if (key = 90) { do handleAttack(); } // Z pour attaquer
+                if (key = 32) { do handleInteraction(); } // Espace pour interagir
+                if (key = 73) { do showInventory(); } // I pour inventaire
+                if (key = 140) { let running = false; } // ESC
+            }
+            
+            if (gameState = 1) { // Combat
+                do handleCombat(key);
+            }
+            
+            do Sys.wait(50);
+        }
+        return;
+    }
+    
+    method void handleMove(int dx, int dy) {
+        var int newX, newY, tile;
+        var Map currentMap;
+        var Enemy enemy;
+        var Item item;
+        
+        let newX = player.getX() + dx;
+        let newY = player.getY() + dy;
+        let currentMap = mapManager.getCurrentMap();
+        let tile = currentMap.getTile(newX, newY);
+        
+        // Vérifier collision avec ennemis
+        if (enemyManager.isEnemyAt(newX, newY, mapManager.getCurrentMapId())) {
+            do player.setDirection(dx, dy);
+            do player.draw();
+            return;
+        }
+        
+        // Vérifier si la case est praticable
+        if ((tile = 0) | (tile = 1) | (tile > 149)) {
+            do player.erase();
+            do currentMap.redrawTile(player.getX(), player.getY());
+            do player.move(dx, dy);
+            do player.draw();
+            
+            // Vérifier ramassage d'objet
+            let item = itemManager.checkPickup(newX, newY, mapManager.getCurrentMapId());
+            if (~(item = null)) {
+                do collectItem(item);
+            }
+            
+            // Vérifier portail
+            if (tile > 149) {
+                do handlePortal(tile);
+            }
+        } else {
+            do player.setDirection(dx, dy);
+            do player.draw();
+        }
+        
+        return;
+    }
+    
+    method void handleAttack() {
+        var int attackX, attackY, direction;
+        var Enemy enemy;
+        
+        if (~hasSword) {
+            return;
+        }
+        
+        let direction = player.getDirection();
+        let attackX = player.getX();
+        let attackY = player.getY();
+        
+        // Position devant le joueur
+        if (direction = 0) { let attackY = attackY + 1; }
+        if (direction = 1) { let attackY = attackY - 1; }
+        if (direction = 2) { let attackX = attackX - 1; }
+        if (direction = 3) { let attackX = attackX + 1; }
+        
+        let enemy = enemyManager.getEnemyAt(attackX, attackY, mapManager.getCurrentMapId());
+        if (~(enemy = null)) {
+            do startCombat(enemy);
+        }
+        
+        return;
+    }
+    
+    method void handleInteraction() {
+        var NPC npc;
+        var int currentMapId;
+        
+        let currentMapId = mapManager.getCurrentMapId();
+        let npc = npcManager.checkInteraction(player.getX(), player.getY(), currentMapId);
+        
+        if (~(npc = null)) {
+            do npc.interact(this);
+            
+            do Screen.clearScreen();
+            do mapManager.draw();
+            do enemyManager.drawForMap(currentMapId);
+            do itemManager.drawForMap(currentMapId);
+            do player.draw();
+            do drawHUD();
+        }
+        
+        return;
+    }
+    
+    method void startCombat(Enemy enemy) {
+        let gameState = 1;
+        let combat = Combat.new(player, enemy);
+        do combat.draw();
+        return;
+    }
+    
+    method void handleCombat(char key) {
+        var int result;
+        
+        if ((key > 48) & (key < 52)) {
+            let result = combat.playerAttack(key - 49);
+            do combat.draw();
+            
+            if (result = 1) { // Victoire
+                do endCombat(true);
+            }
+            if (result = 2) { // Défaite
+                do endCombat(false);
+            }
+        }
+        
+        return;
+    }
+    
+    method void endCombat(boolean won) {
+        var int currentMapId;
+        
+        if (won) {
+            let rupees = rupees + 5;
+        }
+        
+        if (~(combat = null)) {
+            do combat.dispose();
+            let combat = null;
+        }
+        
+        let gameState = 0;
+        let currentMapId = mapManager.getCurrentMapId();
+        
+        do Screen.clearScreen();
+        do mapManager.draw();
+        do enemyManager.drawForMap(currentMapId);
+        do itemManager.drawForMap(currentMapId);
+        do player.draw();
+        do drawHUD();
+        
+        return;
+    }
+    
+    method void collectItem(Item item) {
+        var int type;
+        let type = item.getType();
+        
+        do item.setCollected(true);
+        
+        if (type = 0) { // Coeur
+            let hearts = Math.min(hearts + 1, maxHearts);
+        }
+        if (type = 1) { // Rubis
+            let rupees = rupees + 1;
+        }
+        if (type = 2) { // Épée
+            let hasSword = true;
+        }
+        if (type = 3) { // Bouclier
+            let hasShield = true;
+        }
+        if (type = 4) { // Arc
+            let hasBow = true;
+        }
+        if (type = 5) { // Conteneur de coeur
+            let maxHearts = maxHearts + 1;
+            let hearts = maxHearts;
+        }
+        
+        do drawHUD();
+        return;
+    }
+    
+    method void handlePortal(int portalId) {
+        var int targetMapId;
+        var Array portalPos;
+        var Map targetMap;
+        
+        let targetMapId = mapManager.getCurrentMapId();
+        
+        if (portalId = 150) {
+            if (targetMapId = 0) { let targetMapId = 1; }
+            if (targetMapId = 1) { let targetMapId = 0; }
+        }
+        
+        if (portalId = 151) {
+            if (targetMapId = 1) { let targetMapId = 2; }
+            if (targetMapId = 2) { let targetMapId = 1; }
+        }
+        
+        do mapManager.switchMap(targetMapId, portalId);
+        let targetMap = mapManager.getCurrentMap();
+        let portalPos = targetMap.findPortal(portalId);
+        do player.setPosition(portalPos[0], portalPos[1]);
+        do portalPos.dispose();
+        
+        do Screen.clearScreen();
+        do mapManager.draw();
+        do enemyManager.drawForMap(targetMapId);
+        do itemManager.drawForMap(targetMapId);
+        do player.draw();
+        do drawHUD();
+        
+        return;
+    }
+    
+    method void showInventory() {
+        do Screen.clearScreen();
+        
+        do Output.moveCursor(1, 15);
+        do Output.printString("INVENTAIRE");
+        
+        do Output.moveCursor(3, 5);
+        do Output.printString("Rubis: ");
+        do Output.printInt(rupees);
+        
+        do Output.moveCursor(5, 5);
+        if (hasSword) {
+            do Output.printString("[X] Epee");
+        } else {
+            do Output.printString("[ ] Epee");
+        }
+        
+        do Output.moveCursor(6, 5);
+        if (hasShield) {
+            do Output.printString("[X] Bouclier");
+        } else {
+            do Output.printString("[ ] Bouclier");
+        }
+        
+        do Output.moveCursor(7, 5);
+        if (hasBow) {
+            do Output.printString("[X] Arc");
+        } else {
+            do Output.printString("[ ] Arc");
+        }
+        
+        do Output.moveCursor(20, 5);
+        do Output.printString("Appuyez sur une touche...");
+        
+        while (Keyboard.keyPressed() = 0) {
+            do Sys.wait(50);
+        }
+        while (~(Keyboard.keyPressed() = 0)) {
+            do Sys.wait(50);
+        }
+        
+        do Screen.clearScreen();
+        do mapManager.draw();
+        do enemyManager.drawForMap(mapManager.getCurrentMapId());
+        do itemManager.drawForMap(mapManager.getCurrentMapId());
+        do player.draw();
+        do drawHUD();
+        
+        return;
+    }
+    
+    method void drawHUD() {
+        var int i;
+        
+        // Effacer la zone HUD
+        do Screen.setColor(false);
+        do Screen.drawRectangle(0, 0, 511, 15);
+        
+        // Dessiner les coeurs
+        do Output.moveCursor(0, 2);
+        let i = 0;
+        while (i < maxHearts) {
+            if (i < hearts) {
+                do Output.printChar(3); // Coeur plein
+            } else {
+                do Output.printChar(4); // Coeur vide
+            }
+            let i = i + 1;
+        }
+        
+        // Dessiner les rubis
+        do Output.moveCursor(0, 30);
+        do Output.printString("Rubis:");
+        do Output.printInt(rupees);
+        
+        return;
+    }
+    
+    method int getHearts() { return hearts; }
+    method int getMaxHearts() { return maxHearts; }
+    method int getRupees() { return rupees; }
+    method boolean getHasSword() { return hasSword; }
+    method boolean getHasShield() { return hasShield; }
+    method boolean getHasBow() { return hasBow; }
+    
+    method void setHearts(int value) {
+        let hearts = value;
+        if (hearts < 0) { let hearts = 0; }
+        if (hearts > maxHearts) { let hearts = maxHearts; }
+        return;
+    }
+    
+    method void dispose() {
+        if (~(combat = null)) {
+            do combat.dispose();
+        }
+        do itemManager.dispose();
+        do npcManager.dispose();
+        do enemyManager.dispose();
+        do inventory.dispose();
+        do player.dispose();
+        do mapManager.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+}

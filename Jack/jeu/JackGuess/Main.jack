@@ -1,7 +1,0 @@
-// Main.jack
-class Main {
-   function void main() {
-      do Guess.run();
-      return;
-   }
-}

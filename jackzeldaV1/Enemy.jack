@@ -1,0 +1,86 @@
+// Enemy.jack - Classe pour les ennemis
+class Enemy {
+    field int x, y;
+    field int type; // 0=Moblin, 1=Octorok, 2=Stalfos, 3=Boss
+    field int hp, maxHp;
+    field int attack;
+    field int defense;
+    field int mapId;
+    field boolean defeated;
+    
+    constructor Enemy new(int posX, int posY, int enemyType, int map) {
+        let x = posX;
+        let y = posY;
+        let type = enemyType;
+        let mapId = map;
+        let defeated = false;
+        
+        do initStats();
+        
+        return this;
+    }
+    
+    method void initStats() {
+        if (type = 0) { // Moblin
+            let maxHp = 4;
+            let attack = 2;
+            let defense = 1;
+        }
+        if (type = 1) { // Octorok
+            let maxHp = 3;
+            let attack = 1;
+            let defense = 0;
+        }
+        if (type = 2) { // Stalfos
+            let maxHp = 6;
+            let attack = 3;
+            let defense = 2;
+        }
+        if (type = 3) { // Boss
+            let maxHp = 20;
+            let attack = 5;
+            let defense = 3;
+        }
+        
+        let hp = maxHp;
+        return;
+    }
+    
+    method void takeDamage(int damage) {
+        let hp = hp - damage;
+        if (hp < 0) { let hp = 0; }
+        if (hp = 0) { let defeated = true; }
+        return;
+    }
+    
+    method void draw() {
+        var int location;
+        let location = ((y * 16) * 32) + ((x * 16) / 16);
+        
+        if (type = 0) { do ZeldaSprites.drawMoblin(location); }
+        if (type = 1) { do ZeldaSprites.drawOctorok(location); }
+        if (type = 2) { do ZeldaSprites.drawStalfos(location); }
+        if (type = 3) { do ZeldaSprites.drawBoss(location); }
+        
+        return;
+    }
+    
+    method int getX() { return x; }
+    method int getY() { return y; }
+    method int getType() { return type; }
+    method int getMapId() { return mapId; }
+    method int getHp() { return hp; }
+    method int getMaxHp() { return maxHp; }
+    method int getAttack() { return attack; }
+    method int getDefense() { return defense; }
+    method boolean isDefeated() { return defeated; }
+    
+    method boolean isAtPosition(int checkX, int checkY) {
+        return (x = checkX) & (y = checkY);
+    }
+    
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+}
