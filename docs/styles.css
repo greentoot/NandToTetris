@@ -1,0 +1,27 @@
+:root { color-scheme: dark; --page:#111319; --panel:#1c2029; --line:#323947; --text:#edf0f4; --muted:#a4abb8; --accent:#93c5fd; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--page); color:var(--text); font:16px/1.5 system-ui,Segoe UI,sans-serif; }
+header { height:58px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:18px; padding:0 max(24px,calc((100vw - 1120px)/2)); }
+.brand { color:var(--text); font-weight:700; text-decoration:none; }
+header span, .muted { color:var(--muted); }
+main { max-width:1120px; padding:42px 24px 64px; margin:auto; }
+h1 { font-size:clamp(2rem,4vw,3.2rem); line-height:1.1; margin:0 0 12px; }
+h2 { font-size:1.15rem; margin-top:0; }
+.intro { max-width:720px; margin-bottom:34px; }
+.workspace { display:grid; grid-template-columns:260px minmax(0,1fr); border:1px solid var(--line); background:var(--panel); min-height:480px; }
+.settings { padding:22px; border-right:1px solid var(--line); display:flex; flex-direction:column; gap:9px; }
+label { font-size:.9rem; font-weight:600; margin-top:10px; }
+input[type=file] { display:none; }
+.file-button, button { border:1px solid #55759b; background:#dbeafe; color:#122238; border-radius:4px; padding:10px 12px; font:inherit; font-weight:650; text-align:center; cursor:pointer; }
+button { margin-top:16px; }
+button:disabled { opacity:.45; cursor:not-allowed; }
+select, input[type=range] { width:100%; }
+select { background:#111319; border:1px solid var(--line); color:var(--text); border-radius:4px; padding:8px; font:inherit; }
+.check { font-weight:400; display:flex; gap:8px; align-items:center; }
+.settings p { margin:0 0 7px; overflow-wrap:anywhere; font-size:.82rem; }
+.preview { padding:22px; display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:0; }
+.screen { width:100%; background:#06080c; border:1px solid var(--line); padding:14px; display:flex; align-items:center; justify-content:center; }
+canvas { max-width:100%; height:auto; image-rendering:pixelated; background:white; }
+.preview p { width:100%; margin:12px 0 0; font-size:.88rem; }
+.limits { max-width:720px; border-top:1px solid var(--line); margin-top:36px; padding-top:24px; }
+@media (max-width:700px) { header { padding:0 18px; } main { padding:28px 18px; } .workspace { grid-template-columns:1fr; } .settings { border-right:0; border-bottom:1px solid var(--line); } }
