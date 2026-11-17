@@ -1,0 +1,200 @@
+class Game {
+    static Array background;
+    static int x, y, velocity, facing, frame;
+    static boolean jumpHeld;
+    static int room, tick, bossY, bossFrame;
+    static int attackTimer, bossHP, bossFlash;
+    static boolean attackHeld, hitDone;
+
+    function void init() {
+        do Sprite.init();
+        do Boss.init();
+        if (background = 0) { let background = Array.new(8192); }
+        let facing = 0;
+        let frame = 0;
+        let jumpHeld = false;
+        let bossHP = 8;
+        let bossFlash = 0;
+        let attackHeld = false;
+        do Game.enter(0, 256);
+        return;
+    }
+
+    function void enter(int number, int startX) {
+        var Array screen;
+        var int i;
+        let room = number;
+        if (room = 0) { do Scene.draw(); }
+        if (room = 1) { do Crossing.draw(); }
+        if (room = 2) { do Arena.draw(); }
+        let screen = 16384;
+        let i = 0;
+        while (i < 8192) {
+            let background[i] = screen[i];
+            let i = i + 1;
+        }
+        let x = startX;
+        let y = Game.floor(x, 0) - 48;
+        let velocity = 0;
+        let frame = 0;
+        let attackTimer = 0;
+        let attackHeld = false;
+        let hitDone = false;
+        let bossFlash = 0;
+        let tick = 0;
+        let bossY = 76;
+        let bossFrame = 0;
+        do Game.drawActors();
+        return;
+    }
+
+    function void drawActors() {
+        if ((room = 2) & (bossHP > 0) & ((bossFlash & 1) = 0)) {
+            do Boss.draw(392, bossY, 0, bossFrame);
+        }
+        do Sprite.draw(x, y, facing, frame);
+        return;
+    }
+
+    // One-way platform tops. The other rooms have a continuous floor.
+    function int floor(int px, int feet) {
+        var int result;
+        if (room = 0) { return 218; }
+        if (room = 2) { return 230; }
+        let result = 244;
+        if ((px < 56) & (feet < 201)) { let result = 200; }
+        if ((px > 146) & (px < 288) & (feet < 155)) { let result = 154; }
+        if ((px > 360) & (feet < 167)) { let result = 166; }
+        return result;
+    }
+
+    function void run() {
+        do Game.init();
+        while (true) {
+            do Game.step(Keyboard.keyPressed());
+            do Sys.wait(40);
+        }
+        return;
+    }
+
+    function void restoreRect(int px, int py, int width, int height) {
+        var Array screen;
+        var int row, col, address, columns;
+        if (px < 0) {
+            let width = width + px;
+            let px = 0;
+        }
+        if ((px + width) > 512) { let width = 512 - px; }
+        let screen = 16384;
+        let columns = (width + (px & 15) + 15) / 16;
+        let row = 0;
+        while (row < height) {
+            let address = ((py + row) * 32) + (px / 16);
+            let col = 0;
+            while (col < columns) {
+                let screen[address + col] = background[address + col];
+                let col = col + 1;
+            }
+            let row = row + 1;
+        }
+        return;
+    }
+
+    function void step(int key) {
+        var int nextX, nextY, nextFacing, floorY, oldFrame, oldFlash;
+        var boolean jumping, changed, animate, attacking, inRange;
+        let oldFrame = frame;
+        let oldFlash = bossFlash;
+        if (bossFlash > 0) { let bossFlash = bossFlash - 1; }
+        if (attackTimer > 0) { let attackTimer = attackTimer - 1; }
+        let attacking = (key = 120) | (key = 122);
+        if (attacking & (~attackHeld) & (attackTimer = 0)) {
+            let attackTimer = 12;
+            let hitDone = false;
+        }
+        let attackHeld = attacking;
+        let nextX = x;
+        let nextY = y;
+        let nextFacing = facing;
+        if ((key = 130) & (attackTimer = 0)) {
+            let nextFacing = 1;
+            if (x > 8) { let nextX = x - 8; }
+            else {
+                if (room < 2) {
+                    let facing = 1;
+                    do Game.enter(room + 1, 432);
+                    return;
+                }
+            }
+        }
+        if ((key = 132) & (attackTimer = 0)) {
+            let nextFacing = 0;
+            if (x < 472) { let nextX = x + 8; }
+            else {
+                if (room > 0) {
+                    let facing = 0;
+                    do Game.enter(room - 1, 16);
+                    return;
+                }
+            }
+        }
+        let floorY = Game.floor(nextX, y + 48);
+        let jumping = (key = 131) | (key = 32);
+        if (jumping & (~jumpHeld) & ((y + 48) = Game.floor(x, y + 48)) & (velocity = 0)) {
+            let velocity = -14;
+        }
+        let jumpHeld = jumping;
+        if (((y + 48) < floorY) | (velocity < 0)) {
+            let nextY = y + velocity;
+            let velocity = velocity + 1;
+            if ((nextY + 48) > (floorY - 1)) {
+                let nextY = floorY - 48;
+                let velocity = 0;
+            }
+        }
+        let tick = tick + 1;
+        if (tick > 23) { let tick = 0; }
+        let animate = (room = 2) & ((tick = 0) | (tick = 8));
+        let frame = tick / 12;
+        if (~(nextX = x)) { let frame = 2 + ((tick / 3) & 3); }
+        if ((nextY + 48) < Game.floor(nextX, nextY + 48)) {
+            if (velocity < 0) { let frame = 6; }
+            else { let frame = 7; }
+        }
+        if (attackTimer > 0) { let frame = 8 + ((12 - attackTimer) / 3); }
+        // The forward needle is live only during the strike, once per key press.
+        if ((room = 2) & (bossHP > 0) & (~hitDone) & (attackTimer > 6) & (attackTimer < 10)) {
+            let inRange = false;
+            if (nextFacing = 0) {
+                let inRange = ((nextX + 16) < 440) & ((nextX + 56) > 392);
+            } else {
+                let inRange = ((nextX - 24) < 440) & ((nextX + 16) > 392);
+            }
+            if (inRange & ((nextY + 24) < (bossY + 64)) & ((nextY + 40) > bossY)) {
+                let bossHP = bossHP - 1;
+                let bossFlash = 6;
+                let hitDone = true;
+            }
+        }
+        let changed = (~(nextX = x)) | (~(nextY = y)) | (~(nextFacing = facing));
+        if (changed | animate | (~(frame = oldFrame)) | (~(bossFlash = oldFlash))) {
+            do Game.restoreRect(x - 24, y, 80, 48);
+            if (room = 2) { do Game.restoreRect(392, bossY, 48, 64); }
+            let x = nextX;
+            let y = nextY;
+            let facing = nextFacing;
+            if (animate) {
+                let bossFrame = 1 - bossFrame;
+                let bossY = 76 + (bossFrame * 4);
+            }
+            do Game.drawActors();
+        }
+        return;
+    }
+
+    function int getX() { return x; }
+    function int getY() { return y; }
+    function int getRoom() { return room; }
+    function int getBossHP() { return bossHP; }
+    function int getAttackTimer() { return attackTimer; }
+}

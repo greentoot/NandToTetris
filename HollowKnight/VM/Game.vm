@@ -1,0 +1,847 @@
+function Game.init 0
+call Sprite.init 0
+pop temp 0
+call Boss.init 0
+pop temp 0
+push static 0
+push constant 0
+eq
+not
+if-goto LABEL_0
+push constant 8192
+call Array.new 1
+pop static 0
+goto LABEL_1
+label LABEL_0
+label LABEL_1
+push constant 0
+pop static 4
+push constant 0
+pop static 5
+push constant 0
+pop static 6
+push constant 8
+pop static 12
+push constant 0
+pop static 13
+push constant 0
+pop static 14
+push constant 0
+push constant 256
+call Game.enter 2
+pop temp 0
+push constant 0
+return
+function Game.enter 2
+push argument 0
+pop static 7
+push static 7
+push constant 0
+eq
+not
+if-goto LABEL_2
+call Scene.draw 0
+pop temp 0
+goto LABEL_3
+label LABEL_2
+label LABEL_3
+push static 7
+push constant 1
+eq
+not
+if-goto LABEL_4
+call Crossing.draw 0
+pop temp 0
+goto LABEL_5
+label LABEL_4
+label LABEL_5
+push static 7
+push constant 2
+eq
+not
+if-goto LABEL_6
+call Arena.draw 0
+pop temp 0
+goto LABEL_7
+label LABEL_6
+label LABEL_7
+push constant 16384
+pop local 0
+push constant 0
+pop local 1
+label LABEL_8
+push local 1
+push constant 8192
+lt
+not
+if-goto LABEL_9
+push static 0
+push local 1
+add
+push local 0
+push local 1
+add
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 1
+push constant 1
+add
+pop local 1
+goto LABEL_8
+label LABEL_9
+push argument 1
+pop static 1
+push static 1
+push constant 0
+call Game.floor 2
+push constant 48
+sub
+pop static 2
+push constant 0
+pop static 3
+push constant 0
+pop static 5
+push constant 0
+pop static 11
+push constant 0
+pop static 14
+push constant 0
+pop static 15
+push constant 0
+pop static 13
+push constant 0
+pop static 8
+push constant 76
+pop static 9
+push constant 0
+pop static 10
+call Game.drawActors 0
+pop temp 0
+push constant 0
+return
+function Game.drawActors 0
+push static 7
+push constant 2
+eq
+push static 12
+push constant 0
+gt
+and
+push static 13
+push constant 1
+and
+push constant 0
+eq
+and
+not
+if-goto LABEL_10
+push constant 392
+push static 9
+push constant 0
+push static 10
+call Boss.draw 4
+pop temp 0
+goto LABEL_11
+label LABEL_10
+label LABEL_11
+push static 1
+push static 2
+push static 4
+push static 5
+call Sprite.draw 4
+pop temp 0
+push constant 0
+return
+function Game.floor 1
+push static 7
+push constant 0
+eq
+not
+if-goto LABEL_12
+push constant 218
+return
+goto LABEL_13
+label LABEL_12
+label LABEL_13
+push static 7
+push constant 2
+eq
+not
+if-goto LABEL_14
+push constant 230
+return
+goto LABEL_15
+label LABEL_14
+label LABEL_15
+push constant 244
+pop local 0
+push argument 0
+push constant 56
+lt
+push argument 1
+push constant 201
+lt
+and
+not
+if-goto LABEL_16
+push constant 200
+pop local 0
+goto LABEL_17
+label LABEL_16
+label LABEL_17
+push argument 0
+push constant 146
+gt
+push argument 0
+push constant 288
+lt
+and
+push argument 1
+push constant 155
+lt
+and
+not
+if-goto LABEL_18
+push constant 154
+pop local 0
+goto LABEL_19
+label LABEL_18
+label LABEL_19
+push argument 0
+push constant 360
+gt
+push argument 1
+push constant 167
+lt
+and
+not
+if-goto LABEL_20
+push constant 166
+pop local 0
+goto LABEL_21
+label LABEL_20
+label LABEL_21
+push local 0
+return
+function Game.run 0
+call Game.init 0
+pop temp 0
+label LABEL_22
+push constant 0
+not
+not
+if-goto LABEL_23
+call Keyboard.keyPressed 0
+call Game.step 1
+pop temp 0
+push constant 40
+call Sys.wait 1
+pop temp 0
+goto LABEL_22
+label LABEL_23
+push constant 0
+return
+function Game.restoreRect 5
+push argument 0
+push constant 0
+lt
+not
+if-goto LABEL_24
+push argument 2
+push argument 0
+add
+pop argument 2
+push constant 0
+pop argument 0
+goto LABEL_25
+label LABEL_24
+label LABEL_25
+push argument 0
+push argument 2
+add
+push constant 512
+gt
+not
+if-goto LABEL_26
+push constant 512
+push argument 0
+sub
+pop argument 2
+goto LABEL_27
+label LABEL_26
+label LABEL_27
+push constant 16384
+pop local 0
+push argument 2
+push argument 0
+push constant 15
+and
+add
+push constant 15
+add
+push constant 16
+call Math.divide 2
+pop local 4
+push constant 0
+pop local 1
+label LABEL_28
+push local 1
+push argument 3
+lt
+not
+if-goto LABEL_29
+push argument 1
+push local 1
+add
+push constant 32
+call Math.multiply 2
+push argument 0
+push constant 16
+call Math.divide 2
+add
+pop local 3
+push constant 0
+pop local 2
+label LABEL_30
+push local 2
+push local 4
+lt
+not
+if-goto LABEL_31
+push local 0
+push local 3
+push local 2
+add
+add
+push static 0
+push local 3
+push local 2
+add
+add
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 2
+push constant 1
+add
+pop local 2
+goto LABEL_30
+label LABEL_31
+push local 1
+push constant 1
+add
+pop local 1
+goto LABEL_28
+label LABEL_29
+push constant 0
+return
+function Game.step 11
+push static 5
+pop local 4
+push static 13
+pop local 5
+push static 13
+push constant 0
+gt
+not
+if-goto LABEL_32
+push static 13
+push constant 1
+sub
+pop static 13
+goto LABEL_33
+label LABEL_32
+label LABEL_33
+push static 11
+push constant 0
+gt
+not
+if-goto LABEL_34
+push static 11
+push constant 1
+sub
+pop static 11
+goto LABEL_35
+label LABEL_34
+label LABEL_35
+push argument 0
+push constant 120
+eq
+push argument 0
+push constant 122
+eq
+or
+pop local 9
+push local 9
+push static 14
+not
+and
+push static 11
+push constant 0
+eq
+and
+not
+if-goto LABEL_36
+push constant 12
+pop static 11
+push constant 0
+pop static 15
+goto LABEL_37
+label LABEL_36
+label LABEL_37
+push local 9
+pop static 14
+push static 1
+pop local 0
+push static 2
+pop local 1
+push static 4
+pop local 2
+push argument 0
+push constant 130
+eq
+push static 11
+push constant 0
+eq
+and
+not
+if-goto LABEL_38
+push constant 1
+pop local 2
+push static 1
+push constant 8
+gt
+not
+if-goto LABEL_40
+push static 1
+push constant 8
+sub
+pop local 0
+goto LABEL_41
+label LABEL_40
+push static 7
+push constant 2
+lt
+not
+if-goto LABEL_42
+push constant 1
+pop static 4
+push static 7
+push constant 1
+add
+push constant 432
+call Game.enter 2
+pop temp 0
+push constant 0
+return
+goto LABEL_43
+label LABEL_42
+label LABEL_43
+label LABEL_41
+goto LABEL_39
+label LABEL_38
+label LABEL_39
+push argument 0
+push constant 132
+eq
+push static 11
+push constant 0
+eq
+and
+not
+if-goto LABEL_44
+push constant 0
+pop local 2
+push static 1
+push constant 472
+lt
+not
+if-goto LABEL_46
+push static 1
+push constant 8
+add
+pop local 0
+goto LABEL_47
+label LABEL_46
+push static 7
+push constant 0
+gt
+not
+if-goto LABEL_48
+push constant 0
+pop static 4
+push static 7
+push constant 1
+sub
+push constant 16
+call Game.enter 2
+pop temp 0
+push constant 0
+return
+goto LABEL_49
+label LABEL_48
+label LABEL_49
+label LABEL_47
+goto LABEL_45
+label LABEL_44
+label LABEL_45
+push local 0
+push static 2
+push constant 48
+add
+call Game.floor 2
+pop local 3
+push argument 0
+push constant 131
+eq
+push argument 0
+push constant 32
+eq
+or
+pop local 6
+push local 6
+push static 6
+not
+and
+push static 2
+push constant 48
+add
+push static 1
+push static 2
+push constant 48
+add
+call Game.floor 2
+eq
+and
+push static 3
+push constant 0
+eq
+and
+not
+if-goto LABEL_50
+push constant 14
+neg
+pop static 3
+goto LABEL_51
+label LABEL_50
+label LABEL_51
+push local 6
+pop static 6
+push static 2
+push constant 48
+add
+push local 3
+lt
+push static 3
+push constant 0
+lt
+or
+not
+if-goto LABEL_52
+push static 2
+push static 3
+add
+pop local 1
+push static 3
+push constant 1
+add
+pop static 3
+push local 1
+push constant 48
+add
+push local 3
+push constant 1
+sub
+gt
+not
+if-goto LABEL_54
+push local 3
+push constant 48
+sub
+pop local 1
+push constant 0
+pop static 3
+goto LABEL_55
+label LABEL_54
+label LABEL_55
+goto LABEL_53
+label LABEL_52
+label LABEL_53
+push static 8
+push constant 1
+add
+pop static 8
+push static 8
+push constant 23
+gt
+not
+if-goto LABEL_56
+push constant 0
+pop static 8
+goto LABEL_57
+label LABEL_56
+label LABEL_57
+push static 7
+push constant 2
+eq
+push static 8
+push constant 0
+eq
+push static 8
+push constant 8
+eq
+or
+and
+pop local 8
+push static 8
+push constant 12
+call Math.divide 2
+pop static 5
+push local 0
+push static 1
+eq
+not
+not
+if-goto LABEL_58
+push constant 2
+push static 8
+push constant 3
+call Math.divide 2
+push constant 3
+and
+add
+pop static 5
+goto LABEL_59
+label LABEL_58
+label LABEL_59
+push local 1
+push constant 48
+add
+push local 0
+push local 1
+push constant 48
+add
+call Game.floor 2
+lt
+not
+if-goto LABEL_60
+push static 3
+push constant 0
+lt
+not
+if-goto LABEL_62
+push constant 6
+pop static 5
+goto LABEL_63
+label LABEL_62
+push constant 7
+pop static 5
+label LABEL_63
+goto LABEL_61
+label LABEL_60
+label LABEL_61
+push static 11
+push constant 0
+gt
+not
+if-goto LABEL_64
+push constant 8
+push constant 12
+push static 11
+sub
+push constant 3
+call Math.divide 2
+add
+pop static 5
+goto LABEL_65
+label LABEL_64
+label LABEL_65
+push static 7
+push constant 2
+eq
+push static 12
+push constant 0
+gt
+and
+push static 15
+not
+and
+push static 11
+push constant 6
+gt
+and
+push static 11
+push constant 10
+lt
+and
+not
+if-goto LABEL_66
+push constant 0
+pop local 10
+push local 2
+push constant 0
+eq
+not
+if-goto LABEL_68
+push local 0
+push constant 16
+add
+push constant 440
+lt
+push local 0
+push constant 56
+add
+push constant 392
+gt
+and
+pop local 10
+goto LABEL_69
+label LABEL_68
+push local 0
+push constant 24
+sub
+push constant 440
+lt
+push local 0
+push constant 16
+add
+push constant 392
+gt
+and
+pop local 10
+label LABEL_69
+push local 10
+push local 1
+push constant 24
+add
+push static 9
+push constant 64
+add
+lt
+and
+push local 1
+push constant 40
+add
+push static 9
+gt
+and
+not
+if-goto LABEL_70
+push static 12
+push constant 1
+sub
+pop static 12
+push constant 6
+pop static 13
+push constant 0
+not
+pop static 15
+goto LABEL_71
+label LABEL_70
+label LABEL_71
+goto LABEL_67
+label LABEL_66
+label LABEL_67
+push local 0
+push static 1
+eq
+not
+push local 1
+push static 2
+eq
+not
+or
+push local 2
+push static 4
+eq
+not
+or
+pop local 7
+push local 7
+push local 8
+or
+push static 5
+push local 4
+eq
+not
+or
+push static 13
+push local 5
+eq
+not
+or
+not
+if-goto LABEL_72
+push static 1
+push constant 24
+sub
+push static 2
+push constant 80
+push constant 48
+call Game.restoreRect 4
+pop temp 0
+push static 7
+push constant 2
+eq
+not
+if-goto LABEL_74
+push constant 392
+push static 9
+push constant 48
+push constant 64
+call Game.restoreRect 4
+pop temp 0
+goto LABEL_75
+label LABEL_74
+label LABEL_75
+push local 0
+pop static 1
+push local 1
+pop static 2
+push local 2
+pop static 4
+push local 8
+not
+if-goto LABEL_76
+push constant 1
+push static 10
+sub
+pop static 10
+push constant 76
+push static 10
+push constant 4
+call Math.multiply 2
+add
+pop static 9
+goto LABEL_77
+label LABEL_76
+label LABEL_77
+call Game.drawActors 0
+pop temp 0
+goto LABEL_73
+label LABEL_72
+label LABEL_73
+push constant 0
+return
+function Game.getX 0
+push static 1
+return
+function Game.getY 0
+push static 2
+return
+function Game.getRoom 0
+push static 7
+return
+function Game.getBossHP 0
+push static 12
+return
+function Game.getAttackTimer 0
+push static 11
+return

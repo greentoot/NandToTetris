@@ -6,6 +6,7 @@ Collection de jeux et d'outils réalisés pour Nand2Tetris.
 
 - `jackpokemonV37` : Pokémon Red.
 - `jackzeldaV1` : prototype Zelda.
+- [`HollowKnight`](HollowKnight/) : prototype Silksong en trois zones, avec sources Jack et dossier VM jouable.
 
 ## Nand Asset Studio Lite
 

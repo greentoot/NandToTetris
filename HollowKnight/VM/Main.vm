@@ -1,0 +1,31 @@
+function Main.main 0
+call Title.draw 0
+pop temp 0
+label LABEL_0
+call Keyboard.keyPressed 0
+push constant 128
+eq
+not
+not
+if-goto LABEL_1
+push constant 10
+call Sys.wait 1
+pop temp 0
+goto LABEL_0
+label LABEL_1
+label LABEL_2
+call Keyboard.keyPressed 0
+push constant 0
+eq
+not
+not
+if-goto LABEL_3
+push constant 10
+call Sys.wait 1
+pop temp 0
+goto LABEL_2
+label LABEL_3
+call Game.run 0
+pop temp 0
+push constant 0
+return

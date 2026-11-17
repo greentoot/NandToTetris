@@ -1,0 +1,13 @@
+class Main {
+    function void main() {
+        do Title.draw();
+        while (~(Keyboard.keyPressed() = 128)) {
+            do Sys.wait(10);
+        }
+        while (~(Keyboard.keyPressed() = 0)) {
+            do Sys.wait(10);
+        }
+        do Game.run();
+        return;
+    }
+}
