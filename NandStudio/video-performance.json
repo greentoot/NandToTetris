@@ -1,0 +1,24 @@
+[
+  {
+    "preset": "Rapide",
+    "width": 256,
+    "height": 128,
+    "fps": 8,
+    "frames": 80,
+    "seconds": 0.168,
+    "frames_per_second": 474.9,
+    "memory_bytes": 327680,
+    "faster_than_realtime": 59.4
+  },
+  {
+    "preset": "Nand complet",
+    "width": 512,
+    "height": 256,
+    "fps": 12,
+    "frames": 120,
+    "seconds": 0.174,
+    "frames_per_second": 689.3,
+    "memory_bytes": 1966080,
+    "faster_than_realtime": 57.4
+  }
+]

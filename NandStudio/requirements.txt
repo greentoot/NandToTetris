@@ -1,0 +1,2 @@
+Pillow>=10.0
+# Onglet vidéo : FFmpeg/FFprobe externes, via le PATH ou le bouton de sélection.

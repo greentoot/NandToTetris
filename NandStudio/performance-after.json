@@ -1,0 +1,7 @@
+{
+  "video_decode_ms": 0.754,
+  "video_encode_ms": 2.498,
+  "bayer_ms": 3.21,
+  "background_removal_ms": 18.531,
+  "cpu_100k_ms": 38.21
+}

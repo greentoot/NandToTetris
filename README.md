@@ -14,8 +14,9 @@ fonctionne directement dans le navigateur : import d'image, recadrage,
 conversion noir et blanc et export PNG. Aucun fichier n'est envoyé vers un
 serveur.
 
-La version complète de Nand Asset Studio est une application Python privée.
-Elle n'est pas incluse dans ce dépôt public.
+La version complète de Nand Asset Studio est disponible dans [`NandStudio/`](NandStudio/).
+Elle inclut l'éditeur de sprites, la vidéo et les exécuteurs VM/CPU Hack.
+Voir son guide pour l'installation, les dépendances et les limites de l'émulation.
 
 ## Lancer les jeux
 
